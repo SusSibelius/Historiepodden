@@ -1,0 +1,12 @@
+const PEOPLE=[
+{name:"Napoleon Bonaparte",birth:"15 augusti 1769",death:"5 maj 1821",b:[41.9200,8.7380],d:[-15.9450,5.6800],bp:"Ajaccio, Korsika",dp:"Longwood, Sankta Helena",aliases:["napoleon","napoleon bonaparte"],hint:"Fransk militär och kejsare"},
+{name:"Albert Einstein",birth:"14 mars 1879",death:"18 april 1955",b:[48.4011,9.9876],d:[40.3573,-74.6672],bp:"Ulm, Tyskland",dp:"Princeton, USA",aliases:["albert einstein","einstein"],hint:"Fysiker och Nobelpristagare"},
+{name:"Cleopatra",birth:"69 f.Kr.",death:"12 augusti 30 f.Kr.",b:[31.2001,29.9187],d:[31.2001,29.9187],bp:"Alexandria, Egypten",dp:"Alexandria, Egypten",aliases:["cleopatra","cleopatra vii","cleopatra vii philopator"],hint:"Drottning av det ptolemeiska Egypten"},
+{name:"Leonardo da Vinci",birth:"15 april 1452",death:"2 maj 1519",b:[43.7990,10.9220],d:[47.3875,0.6686],bp:"Vinci, Italien",dp:"Amboise, Frankrike",aliases:["leonardo da vinci","da vinci"],hint:"Konstnär, uppfinnare och vetenskapsman"},
+{name:"Mahatma Gandhi",birth:"2 oktober 1869",death:"30 januari 1948",b:[21.6417,69.6293],d:[28.6139,77.2090],bp:"Porbandar, Indien",dp:"New Delhi, Indien",aliases:["gandhi","mahatma gandhi","mohandas gandhi","mohandas karamchand gandhi"],hint:"Indisk självständighetsledare"},
+{name:"William Shakespeare",birth:"23 april 1564",death:"23 april 1616",b:[52.1917,-1.7073],d:[52.1917,-1.7073],bp:"Stratford-upon-Avon, England",dp:"Stratford-upon-Avon, England",aliases:["william shakespeare","shakespeare"],hint:"Engelsk dramatiker och poet"},
+{name:"Marie Curie",birth:"7 november 1867",death:"4 juli 1934",b:[52.2297,21.0122],d:[45.9225,6.7236],bp:"Warszawa, Polen",dp:"Passy, Frankrike",aliases:["marie curie","curie","maria sklodowska curie"],hint:"Fysiker och kemist"},
+{name:"Christopher Columbus",birth:"1451",death:"20 maj 1506",b:[44.4072,8.9339],d:[41.6523,-4.7245],bp:"Genua, Italien",dp:"Valladolid, Spanien",aliases:["christopher columbus","columbus","cristoforo colombo"],hint:"Sjöfarare och upptäcktsresande"},
+{name:"Abraham Lincoln",birth:"12 februari 1809",death:"15 april 1865",b:[37.5311,-85.7375],d:[38.8913,-77.0366],bp:"Hardin County, USA",dp:"Washington D.C., USA",aliases:["abraham lincoln","lincoln"],hint:"USA:s 16:e president"},
+{name:"Frida Kahlo",birth:"6 juli 1907",death:"13 juli 1954",b:[19.3561,-99.1626],d:[19.3561,-99.1626],bp:"Coyoacán, Mexiko",dp:"Coyoacán, Mexiko",aliases:["frida kahlo","kahlo"],hint:"Mexikansk konstnär"}
+];
