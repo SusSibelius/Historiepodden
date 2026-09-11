@@ -298,14 +298,21 @@ main {
 
 .pin-marker {
   position: absolute;
-
   width: 100px;
-  height: 70px;
+  height: 76px;
 
   z-index: 20;
 
+  /*
+   * The JavaScript position represents the EXACT geographic
+   * coordinate. The arrow tip must sit exactly on that point.
+   *
+   * The arrow extends 76px downward from the marker's
+   * untransformed top, so move the marker upward by exactly
+   * 76px.
+   */
   transform:
-    translate(-50%, -70px);
+    translate(-50%, -76px);
 
   pointer-events: none;
 
