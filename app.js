@@ -8,26 +8,82 @@ const map=document.getElementById("map"), world=document.getElementById("mapWorl
 function yearOnly(date){const m=date.match(/\d{1,4}/g);return m?m[m.length-1]:date}
 function project([lat,lon]){const w=map.clientWidth,h=map.clientHeight;return{x:((lon+180)/360)*w,y:((85-lat)/145)*h}}
 function setZoomAndCenter(a,d){
- const w=map.clientWidth,h=map.clientHeight;
- // Keep the two true geographic points visible with as much useful zoom as possible.
- // The map is transformed; the markers remain fixed-size overlays at the exact
- // projected coordinates, so zoom never changes their physical size or moves them.
- const padX=150,padY=110;
- const dx=Math.abs(d.x-a.x),dy=Math.abs(d.y-a.y);
- const maxScale=4.5;
- let scale=Math.min(maxScale,Math.max(1.0,Math.min((w-padX*2)/Math.max(dx,1),(h-padY*2)/Math.max(dy,1))));
- const distance=Math.hypot(dx,dy);
- // Very close locations deserve extra zoom so they are not visually collapsed.
- if(distance < 120) scale=Math.min(maxScale,Math.max(scale,3.2));
- if(distance < 45) scale=Math.min(maxScale,Math.max(scale,4.0));
- if(distance < 2) scale=maxScale;
- const cx=(a.x+d.x)/2,cy=(a.y+d.y)/2;
- let tx=w/2-cx*scale,ty=h/2-cy*scale;
- const minTx=w-w*scale,maxTx=0,minTy=h-h*scale,maxTy=0;
- tx=Math.max(minTx,Math.min(maxTx,tx));
- ty=Math.max(minTy,Math.min(maxTy,ty));
- world.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
- return {scale,tx,ty};
+  const w = map.clientWidth;
+  const h = map.clientHeight;
+
+  /*
+   * Responsive padding.
+   *
+   * The old version used fixed 150px / 110px padding.
+   * That works on desktop but consumes far too much of a
+   * phone-sized map.
+   */
+  const padX = Math.max(35, Math.min(150, w * 0.12));
+  const padY = Math.max(35, Math.min(110, h * 0.18));
+
+  const dx = Math.abs(d.x - a.x);
+  const dy = Math.abs(d.y - a.y);
+
+  const maxScale = 4.5;
+
+  const availableW = Math.max(1, w - padX * 2);
+  const availableH = Math.max(1, h - padY * 2);
+
+  let scale = Math.min(
+    maxScale,
+    Math.max(
+      1.0,
+      Math.min(
+        availableW / Math.max(dx, 1),
+        availableH / Math.max(dy, 1)
+      )
+    )
+  );
+
+  const distance = Math.hypot(dx, dy);
+
+  /*
+   * Keep the existing close-location behaviour.
+   * This is purely visual; it does not alter game mechanics.
+   */
+  if (distance < 120) {
+    scale = Math.min(maxScale, Math.max(scale, 3.2));
+  }
+
+  if (distance < 45) {
+    scale = Math.min(maxScale, Math.max(scale, 4.0));
+  }
+
+  if (distance < 2) {
+    scale = maxScale;
+  }
+
+  const cx = (a.x + d.x) / 2;
+  const cy = (a.y + d.y) / 2;
+
+  let tx = w / 2 - cx * scale;
+  let ty = h / 2 - cy * scale;
+
+  /*
+   * Keep the transformed world inside the map viewport.
+   */
+  const minTx = w - w * scale;
+  const maxTx = 0;
+
+  const minTy = h - h * scale;
+  const maxTy = 0;
+
+  tx = Math.max(minTx, Math.min(maxTx, tx));
+  ty = Math.max(minTy, Math.min(maxTy, ty));
+
+  world.style.transform =
+    `translate(${tx}px,${ty}px) scale(${scale})`;
+
+  return {
+    scale,
+    tx,
+    ty
+  };
 }
 function screenPoint(base,view){
  return {x:base.x*view.scale+view.tx,y:base.y*view.scale+view.ty};
@@ -164,4 +220,18 @@ document.getElementById("nextBtn").addEventListener("click",()=>{
  document.getElementById("nextBtn").textContent="Nästa →";
  loadRound();
 });
-window.addEventListener("resize",loadRound);loadRound();
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    const p = deck[round % deck.length];
+
+    requestAnimationFrame(() => {
+      placePins(p);
+    });
+  }, 100);
+});
+
+loadRound();
