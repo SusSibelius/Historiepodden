@@ -1,4 +1,3 @@
-```css
 :root {
   --ink: #171717;
   --muted: #777;
@@ -6,20 +5,7 @@
   --line: #dedbd3;
   --green: #23a455;
   --red: #d94a45;
-
-  /*
-   * The map is deliberately kept within a sensible playing size.
-   * This prevents the game from becoming unusably small on phones
-   * while also preventing it from becoming enormous on large screens.
-   */
-  --map-max-width: 1200px;
-  --map-min-height: 280px;
 }
-
-
-/* =========================================================
-   GLOBAL
-   ========================================================= */
 
 * {
   box-sizing: border-box;
@@ -37,17 +23,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
-
-  /*
-   * Prevents accidental horizontal movement caused by mobile
-   * browser rendering.
-   */
-  overflow-x: hidden;
-
-  /*
-   * Helps mobile browsers avoid the text-size adjustment that
-   * can otherwise make the UI unexpectedly large.
-   */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -69,16 +44,12 @@ body {
   padding: 0 18px;
 
   background: #fff;
-
-  position: relative;
-  z-index: 100;
 }
 
 .brand {
   font-weight: 800;
   letter-spacing: 2px;
   font-size: 15px;
-
   white-space: nowrap;
 }
 
@@ -103,8 +74,7 @@ body {
 .round-button {
   border: 0;
   background: transparent;
-
-  padding: 4px 0;
+  padding: 0;
 
   color: var(--muted);
   font: inherit;
@@ -122,25 +92,17 @@ body {
 
 
 /* =========================================================
-   MAIN GAME AREA
+   MAIN
    ========================================================= */
 
 main {
-  /*
-   * dvh is much more reliable on phones because it accounts
-   * for the browser address bar and other dynamic UI.
-   */
-  height: calc(100dvh - 48px);
+  width: min(1200px, 100%);
 
-  width: min(100%, var(--map-max-width));
+  height: calc(100dvh - 48px);
 
   margin: 0 auto;
 
-  padding:
-    8px
-    max(14px, env(safe-area-inset-right))
-    max(10px, env(safe-area-inset-bottom))
-    max(14px, env(safe-area-inset-left));
+  padding: 8px 14px 10px;
 
   display: flex;
   flex-direction: column;
@@ -160,10 +122,6 @@ main {
 
   position: relative;
   z-index: 5;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .eyebrow {
@@ -192,19 +150,20 @@ main {
 
 
 /* =========================================================
-   MAP / PLAYING FIELD
+   MAP
    ========================================================= */
 
 #map {
   position: relative;
 
   /*
-   * Instead of letting the map collapse to whatever space
-   * remains, we give it a sensible minimum size.
+   * The map remains the flexible game area.
+   * It expands/shrinks with the available viewport.
    */
   flex: 1 1 auto;
 
-  min-height: var(--map-min-height);
+  min-width: 0;
+  min-height: 0;
 
   width: 100%;
 
@@ -216,15 +175,10 @@ main {
   background: #a8d4e2;
 
   /*
-   * Prevents browser gestures from interfering with map
-   * interaction on touch devices.
+   * Prevent mobile browsers from interpreting map touches
+   * as page scrolling/zooming.
    */
   touch-action: none;
-
-  /*
-   * Creates a stable containing block for all map elements.
-   */
-  isolation: isolate;
 }
 
 .map-world {
@@ -237,7 +191,7 @@ main {
 
   background:
     #a8d4e2
-    url('world-map.png')
+    url("world-map.png")
     center / 100% 100%
     no-repeat;
 
@@ -245,16 +199,12 @@ main {
 
   will-change: transform;
 
-  /*
-   * Keep map manipulation under the browser's normal touch
-   * handling.
-   */
-  touch-action: none;
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   PINS
+   BIRTH / DEATH MARKERS
    ========================================================= */
 
 .pin-marker {
@@ -268,17 +218,26 @@ main {
   transform: translate(-50%, -70px);
 
   pointer-events: none;
-
-  --pin-color: var(--ink);
 }
 
+
+/*
+ * IMPORTANT:
+ *
+ * Do NOT use a generic black pin color here.
+ * Birth and death are explicitly coloured.
+ */
+
 .pin-marker.birth {
-  --pin-color: var(--green);
+  color: var(--green);
 }
 
 .pin-marker.death {
-  --pin-color: var(--red);
+  color: var(--red);
 }
+
+
+/* The actual vertical arrow/line */
 
 .map-pin {
   position: absolute;
@@ -286,18 +245,34 @@ main {
   left: 50%;
   top: 25px;
 
-  width: 2px;
+  width: 3px;
   height: 43px;
-
-  background: var(--pin-color);
 
   transform: translateX(-50%);
 
-  box-shadow: none;
-
-  border: 0;
   border-radius: 2px;
+
+  z-index: 2;
 }
+
+
+/* Birth arrow */
+
+.pin-marker.birth .map-pin {
+  background: var(--green);
+}
+
+
+/* Death arrow */
+
+.pin-marker.death .map-pin {
+  background: var(--red);
+}
+
+
+/*
+ * Arrow head
+ */
 
 .map-pin::after {
   content: "";
@@ -310,16 +285,40 @@ main {
   width: 0;
   height: 0;
 
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 8px solid var(--pin-color);
+  transform: translateX(-50%);
 
-  transform: translate(-50%, 0);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
 }
+
+
+/* Green arrow head */
+
+.pin-marker.birth .map-pin::after {
+  border-top: 9px solid var(--green);
+}
+
+
+/* Red arrow head */
+
+.pin-marker.death .map-pin::after {
+  border-top: 9px solid var(--red);
+}
+
+
+/*
+ * The span is kept because it exists in the HTML,
+ * but the arrow itself is generated above.
+ */
 
 .map-pin span {
   display: none;
 }
+
+
+/* =========================================================
+   YEAR LABELS
+   ========================================================= */
 
 .pin-year {
   position: absolute;
@@ -332,25 +331,38 @@ main {
   text-align: center;
 
   font-family: Georgia, serif;
+
   font-size: 15px;
   font-weight: 700;
 
   line-height: 1;
 
-  color: var(--pin-color);
-
   white-space: nowrap;
 
-  z-index: 2;
+  z-index: 5;
 
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 
 /*
- * If birth and death are exactly the same place, keep both
- * years readable while both arrows still point to the exact
- * same geographic coordinate.
+ * EXPLICIT colours.
+ * This prevents the years ever falling back to black.
+ */
+
+.pin-marker.birth .pin-year {
+  color: var(--green);
+}
+
+.pin-marker.death .pin-year {
+  color: var(--red);
+}
+
+
+/*
+ * Same-location handling.
+ * Both years remain visible while the arrows still point
+ * to the exact same geographic position.
  */
 
 .pin-marker.same-location.birth .pin-year {
@@ -391,15 +403,11 @@ main {
 
   pointer-events: auto;
 
+  max-width: calc(100% - 16px);
+
   max-height: calc(100% - 18px);
 
   overflow: auto;
-
-  /*
-   * Makes the box behave properly if the viewport becomes
-   * exceptionally small.
-   */
-  max-width: calc(100% - 16px);
 }
 
 .run-status {
@@ -415,7 +423,6 @@ main {
 
 .input-row {
   display: flex;
-
   gap: 6px;
 
   width: 100%;
@@ -429,7 +436,6 @@ main {
   padding: 7px 9px;
 
   border: 0;
-
   border-bottom: 1px solid #aaa;
 
   background: #fff;
@@ -438,9 +444,6 @@ main {
 
   outline: none;
 
-  /*
-   * Prevent iOS Safari from zooming when the input is focused.
-   */
   -webkit-appearance: none;
 }
 
@@ -495,7 +498,6 @@ main {
 
 .lifeline:disabled {
   opacity: 0.45;
-
   cursor: default;
 }
 
@@ -564,7 +566,7 @@ main {
 
 
 /* =========================================================
-   HISTORY PANEL
+   HISTORY
    ========================================================= */
 
 .history-panel {
@@ -666,148 +668,99 @@ main {
 @media (max-width: 900px) {
 
   .topbar {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   main {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 9px;
+    padding-right: 9px;
   }
 
   .intro {
-    flex-basis: 58px;
+    flex-basis: 56px;
   }
 
   .intro h1 {
     font-size: 21px;
   }
-
-  .guess-area {
-    width: 245px;
-  }
 }
 
 
 /* =========================================================
-   PHONES — PORTRAIT
+   PHONES
    ========================================================= */
 
-@media (max-width: 650px) and (orientation: portrait) {
+@media (max-width: 650px) {
 
   .topbar {
     height: 46px;
     min-height: 46px;
 
-    padding:
-      0
-      max(10px, env(safe-area-inset-right))
-      0
-      max(10px, env(safe-area-inset-left));
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .brand {
-    font-size: 12px;
-
-    letter-spacing: 1.3px;
+    font-size: 11px;
+    letter-spacing: 1.2px;
   }
 
   .logo {
     font-size: 17px;
-
     margin-right: 4px;
   }
 
   .stats {
-    gap: 9px;
-
+    gap: 8px;
     font-size: 11px;
   }
-
-  .stats #runLabel {
-    display: inline;
-  }
-
 
   main {
     height: calc(100dvh - 46px);
 
     padding:
-      6px
-      max(7px, env(safe-area-inset-right))
+      5px
+      7px
       max(7px, env(safe-area-inset-bottom))
-      max(7px, env(safe-area-inset-left));
+      7px;
   }
 
-
-  /*
-   * Much less vertical space is spent on the title on phones.
-   */
   .intro {
     flex: 0 0 50px;
   }
 
   .eyebrow {
     font-size: 7px;
-
-    letter-spacing: 1.5px;
+    letter-spacing: 1.4px;
 
     margin-bottom: 2px;
   }
 
   .intro h1 {
     font-size: 18px;
-
-    line-height: 1.05;
   }
 
   .sub {
     display: none;
   }
 
-
   /*
-   * The map remains the dominant element.
+   * The map gets all remaining screen space.
    */
   #map {
     min-height: 0;
-
-    border-radius: 5px;
   }
-
 
   /*
-   * A slightly smaller box allows more of the map to remain
-   * visible while still being comfortably tappable.
+   * Finger-friendly input.
+   * 16px prevents automatic iPhone zoom.
    */
-  .guess-area {
-    width: min(235px, calc(100% - 14px));
-
-    padding: 8px;
-
-    max-height: calc(100% - 14px);
-  }
-
-  .run-status {
-    font-size: 9px;
-
-    margin-bottom: 5px;
-  }
-
-  .input-row {
-    gap: 5px;
-  }
-
   .input-row input {
-    min-width: 0;
-
     height: 38px;
 
     padding: 8px 9px;
 
-    /*
-     * 16px avoids automatic iOS zoom.
-     */
     font-size: 16px;
   }
 
@@ -819,38 +772,28 @@ main {
     font-size: 12px;
   }
 
-  .actions {
-    font-size: 9px;
+  .guess-area {
+    width: min(235px, calc(100% - 14px));
 
-    margin-top: 5px;
+    padding: 8px;
+
+    max-height: calc(100% - 14px);
   }
 
   .lifeline {
-    padding: 5px 6px;
-
-    /*
-     * Gives the button a useful touch area.
-     */
     min-height: 30px;
+
+    padding: 5px 6px;
   }
 
   .next {
     min-height: 36px;
-
-    padding: 7px 14px;
   }
-
-  .result {
-    font-size: 11px;
-
-    max-height: 110px;
-  }
-
 
   .history-panel {
-    right: -2px;
-
     width: min(230px, calc(100vw - 14px));
+
+    right: -2px;
   }
 }
 
@@ -859,12 +802,10 @@ main {
    VERY SMALL PHONES
    ========================================================= */
 
-@media (max-width: 380px) and (orientation: portrait) {
+@media (max-width: 380px) {
 
   .brand {
     font-size: 10px;
-
-    letter-spacing: 1px;
   }
 
   .logo {
@@ -872,9 +813,8 @@ main {
   }
 
   .stats {
+    gap: 5px;
     font-size: 10px;
-
-    gap: 6px;
   }
 
   .intro {
@@ -887,28 +827,12 @@ main {
 
   .guess-area {
     width: min(220px, calc(100% - 12px));
-
-    padding: 7px;
-  }
-
-  .input-row input {
-    height: 36px;
-
-    font-size: 16px;
-  }
-
-  .input-row button {
-    height: 36px;
-
-    padding: 0 10px;
-
-    font-size: 11px;
   }
 }
 
 
 /* =========================================================
-   PHONE — LANDSCAPE
+   LANDSCAPE PHONES
    ========================================================= */
 
 @media (max-width: 900px) and (orientation: landscape) {
@@ -916,30 +840,24 @@ main {
   .topbar {
     height: 42px;
     min-height: 42px;
-
-    padding-left: 12px;
-    padding-right: 12px;
   }
 
   main {
     height: calc(100dvh - 42px);
 
     padding:
-      5px
-      max(8px, env(safe-area-inset-right))
-      max(5px, env(safe-area-inset-bottom))
-      max(8px, env(safe-area-inset-left));
+      4px
+      8px
+      4px
+      8px;
   }
 
   .intro {
-    /*
-     * Landscape phones have very little vertical space,
-     * so the heading is kept extremely compact.
-     */
-    flex: 0 0 38px;
+    flex: 0 0 36px;
   }
 
-  .eyebrow {
+  .eyebrow,
+  .sub {
     display: none;
   }
 
@@ -947,54 +865,27 @@ main {
     font-size: 17px;
   }
 
-  .sub {
-    display: none;
-  }
-
   .guess-area {
     width: 235px;
+  }
 
-    padding: 6px 7px;
+  .input-row input,
+  .input-row button {
+    height: 34px;
   }
 
   .input-row input {
-    height: 34px;
-
     font-size: 16px;
-  }
-
-  .input-row button {
-    height: 34px;
-
-    padding: 0 11px;
-  }
-
-  .actions {
-    margin-top: 2px;
-  }
-
-  .lifeline {
-    min-height: 26px;
-
-    padding: 3px 5px;
   }
 
   .result {
     max-height: 80px;
-
-    padding: 6px;
-  }
-
-  .next {
-    min-height: 32px;
-
-    margin-top: 4px;
   }
 }
 
 
 /* =========================================================
-   SHORT DESKTOP / LAPTOP WINDOWS
+   SHORT SCREENS
    ========================================================= */
 
 @media (min-width: 651px) and (max-height: 700px) {
@@ -1023,4 +914,3 @@ main {
     transition: none;
   }
 }
-```
