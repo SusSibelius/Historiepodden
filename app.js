@@ -45,7 +45,7 @@ function project([lat, lon]) {
 
   return {
     x: ((lon + 180) / 360) * w,
-    y: ((85 - lat) / 145) * h
+    y: ((90 - lat) / 180) * h
   };
 }
 
